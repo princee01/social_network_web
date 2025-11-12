@@ -1,0 +1,119 @@
+<!-- prettier-ignore -->
+{% load tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% tailwind_css %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registeration Form</title>
+  </head>
+  <body class="bg-red-200 h-full flex justify-center items-center">
+    <div class="flex flex-col my-20 center w-120 h-170 bg-gray-100 rounded-3xl">
+      <form
+        action="{% url 'register' %}"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+
+        <div class="profile-pic p-4 flex flex-col justify-center items-center">
+          <img
+            id="output_image"
+            src="{{ form.profilePicture.value.url }}"
+            class="w-32 h-32 rounded-full object-cover border-1"
+          />
+          <input
+            id="profilePicture"
+            type="file"
+            name="profilePicture"
+            accept="image/*"
+            onchange="display_picture(event)"
+            class="hidden"
+          />
+          <label for="profilePicture" class="cursor-pointer text-blue-500"
+            >Upload Image</label
+          >
+        </div>
+        <div class="name flex gap-2 flex-col px-5">
+          <label for="{{form.username.id_for_label}}"
+            >{{form.username.label}}</label
+          >
+          <input
+            class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"
+            id="{{form.username.id_for_label}}"
+            type="text"
+            name="{{form.username.name}}"
+            value="{{form.username.value}}"
+          />
+        </div>
+        <div class="name flex gap-2 flex-col px-5">
+          <label for="{{form.dateOfBirth.id_for_label}}"
+            >{{form.dateOfBirth.label}}</label
+          >
+          <input
+            class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"
+            id="{{form.dateOfBirth.id_for_label}}"
+            type="date"
+            name="{{form.dateOfBirth.name}}"
+            value="{{form.dateOfBirth.value}}"
+          />
+        </div>
+        <div class="name flex gap-2 flex-col px-5">
+          <label for="{{form.email.id_for_label}}">{{form.email.label}}</label>
+          <input
+            class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"
+            id="{{form.email.id_for_label}}"
+            type="email"
+            name="{{form.email.name}}"
+            value="{{form.email.value}}"
+          />
+        </div>
+        <div class="name flex gap-2 flex-col px-5">
+          <label for="{{form.password1.id_for_label}}"
+            >{{form.password1.label}}</label
+          >
+          <input
+            class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"
+            id="{{form.password1.id_for_label}}"
+            type="password"
+            name="{{form.password1.name}}"
+            value="{{form.password1.value}}"
+          />
+        </div>
+
+        <div class="name flex gap-2 flex-col px-5">
+          <label for="{{form.password2.id_for_label}}"
+            >{{form.password2.label}}</label
+          >
+          <input
+            class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"
+            id="{{form.password2.id_for_label}}"
+            type="password"
+            name="{{form.password2.name}}"
+            value="{{form.password2.value}}"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="flex w-90 mt-10 m-auto justify-center bg-blue-600 text-white rounded-3xl p-2 font-bold"
+        >
+          Register here
+        </button>
+      </form>
+    </div>
+
+    <script>
+      function display_picture(e) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const output = document.getElementById("output_image");
+          output.src = reader.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    </script>
+  </body>
+</html>

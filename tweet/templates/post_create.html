@@ -1,0 +1,38 @@
+<!-- prettier-ignore -->
+{% extends "layout.html" %} 
+{% block title  %}
+Post Create
+{% endblock %} 
+
+{% block content %}
+
+<h2>
+  {% if form.instance.pk %} Edit Tweet {% else %}
+  <div class="flex mx-5">
+    <button class="p-3 text-start font-bold mx-50">Add Post</button>
+  </div>
+  {% endif %}
+</h2>
+
+<div class="">
+  <form
+    method="POST"
+    enctype="multipart/form-data"
+    class="form mx-50 p-3 bg-gray-200 max-w-87 rounded-3xl min-w-87"
+  >
+    {% csrf_token %}
+    <label for="text" class="font-bold">Enter Description </label>
+    <div class="rounded-2xl p-2">{{form.text}}</div>
+
+    <label for="image" class="font-bold">Add Image {{form.photo}}</label>
+    <div class="w-full flex justify-center">
+      <button
+        type="submit"
+        class="bg-blue-500 text-white font-bold p-2 rounded-3xl w-20 mt-3"
+      >
+        Submit {{form.submit}}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
