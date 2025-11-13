@@ -32,4 +32,5 @@ class Login(forms.Form):
 class profileForm(forms.ModelForm):
     class Meta:
         model=Profile
-        fields=['user','profilePicture','dateOfBirth']
+        fields=['profilePicture','dateOfBirth']
+        exclude=['user']

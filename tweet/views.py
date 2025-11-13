@@ -111,11 +111,14 @@ def updateProfile(request):
     profile_instance=get_object_or_404(Profile, user=request.user)
     if request.method=='POST':
         form=profileForm(request.POST,request.FILES, instance=profile_instance)
+       
         if form.is_valid():
             profile_instance=form.save(commit=False)
             profile_instance.user=request.user
             profile_instance.save()
             return redirect('/')
+        else:
+            print(form.errors)
     else:
         form=profileForm(instance=profile_instance)
     return render(request, 'update_profile.html',{'form':form})
