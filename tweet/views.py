@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import post, Reaction, Profile
-from .forms import PostForm, ReactionForm, UserRegForm,profileForm  
+from .forms import PostForm, ReactionForm, UserRegForm,profileForm, usernameForm  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.shortcuts import get_object_or_404, redirect
@@ -38,6 +38,7 @@ def post_create(request):
         form = PostForm()
     return render(request, 'post_create.html', {'form': form})
 
+
 @login_required
 def post_edit(request, post_id):
     post_instance = get_object_or_404(post, pk=post_id, user=request.user)
@@ -51,6 +52,7 @@ def post_edit(request, post_id):
     else:
         form = PostForm(instance=post_instance)
     return render(request, 'post_edit.html', {'form': form})
+
 
 @login_required    
 def post_delete(request, post_id):
@@ -111,15 +113,17 @@ def updateProfile(request):
     profile_instance=get_object_or_404(Profile, user=request.user)
     if request.method=='POST':
         form=profileForm(request.POST,request.FILES, instance=profile_instance)
-       
-        if form.is_valid():
+        username_form=usernameForm(request.POST, instance=request.user)
+        if form.is_valid() and username_form.is_valid():
             profile_instance=form.save(commit=False)
             profile_instance.user=request.user
+            username_form.save()
             profile_instance.save()
             return redirect('/')
         else:
             print(form.errors)
     else:
         form=profileForm(instance=profile_instance)
-    return render(request, 'update_profile.html',{'form':form})
+        username_form=usernameForm(instance=request.user)
+    return render(request, 'update_profile.html',{'form':form, 'username_form':username_form})
 

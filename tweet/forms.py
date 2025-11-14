@@ -34,3 +34,8 @@ class profileForm(forms.ModelForm):
         model=Profile
         fields=['profilePicture','dateOfBirth']
         exclude=['user']
+
+class usernameForm(forms.ModelForm):
+    class Meta:
+        model=User
+        fields=['username']

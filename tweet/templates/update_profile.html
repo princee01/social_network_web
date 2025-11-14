@@ -41,6 +41,15 @@
       </div>
 
       <div class="flex flex-col w-80">
+        <label for="{{username_form.username.id_for_label}}"
+          >{{username_form.username.label}}</label
+        >
+        <input type="text" id="{{username_form.username.id_for_label}}"
+        name="username" value="{{username_form.username.value}}"
+        class="rounded-2xl p-2 border-1 border-gray-400 mb-1 w-full text-sm"/ >
+      </div>
+
+      <div class="flex flex-col w-80">
         <label for="{{form.dateOfBirth.id_for_label}}"
           >{{form.dateOfBirth.label}}</label
         >
