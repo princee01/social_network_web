@@ -2,111 +2,142 @@
 {% extends "layout.html" %}
 {% load static %}
 
- 
-{% block content %}
-
-<div class="w-full flex justify-center">
-  <a
-    href="{% url 'post-create' %}"
-    class="btn btn-primary bg-blue-600 mb-4 p-2 rounded-3xl font-bold text-white"
-    >Create a post</a
-  >
+{% block hidden_content %}
+<div
+  id="edit-post-container"
+  class="mt-5 w-120 rounded-3xl bg-amber-200 p-3 font-bold"
+  style="display: none"
+>
+  <h2 class="mb-5">Edit Post</h2>
+  <form id="edit-form" method="POST" enctype="multipart/form-data">
+    {% csrf_token %} Text:
+    <textarea id="edit-text" rows="4" cols="50"></textarea><br />
+    Photo: <br />
+    <img
+      src=""
+      alt=""
+      id="existing-photo"
+      style="width: 200px; display: none"
+    /><br />
+    <input type="file" id="edit-photo" name="photo" /><br />
+    <button type="submit">Update Post</button>
+  </form>
 </div>
+{% endblock %} {% block content %}
 
-<div class="container flex-row gap-3">
-  {% for post in posts %}
-  <!-- Card Container -->
-  <div
-    id="post-{{ post.id }}"
-    class="max-w-md mb-2 mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
-  >
-    <!-- User Info Row -->
-    <div class="heading flex justify-between">
-      <div class="flex items-center p-4">
-        <img
-          class="w-12 h-12 rounded-full object-cover bg-blue-900 mr-3"
-          src="{{post.user.profile.profilePicture.url}}"
-          alt="User DP"
-        />
-        <div>
-          <h3 class="text-md font-bold text-gray-800">
-            @{{post.user.username}} <br />
-            {{post.created_at|date:"M d, Y"}}
-          </h3>
-        </div>
-      </div>
-      <div class="crud flex p-4 gap-3">
-        {% if post.user == request.user %}
-        <a
-          href="{% url 'post-edit' post.id %}"
-          class="bg-gray-400 pb-0 rounded-3xl flex items-center justify-center w-18 h-10 font-bold"
-          >Edit</a
-        >
-        <button
-          type="submit"
-          onclick="deletePost(event, {{post.id}})"
-          class="bg-gray-400 pb-0 rounded-3xl flex items-center justify-center w-18 h-10 font-bold"
-        >
-          Delete
-        </button>
-        {% endif %}
-      </div>
-    </div>
-    <!-- Post Description  -->
-    <p class="px-4 w-full text-sm font-semibold text-gray-500">{{post.text}}</p>
-    <!-- Post Image -->
-    {% if post.photo %}
-    <div>
-      <img
-        class="w-full object-cover p-4"
-        src="{{ post.photo.url }}"
-        alt="Post Image"
-      />
-    </div>
-    {% else %}
-    <div>
-      <img
-        class="w-full object-cover p-4"
-        src="https://via.placeholder.com/600x400?text=No+Image"
-        alt="Default Image"
-      />
-    </div>
-    {% endif %}
-
-    <!-- Reaction Buttons -->
-    <div
-      class="flex justify-around items-center py-3 border-t border-gray-200 bg-gray-50"
+<div id="main-list-content">
+  <div class="w-full flex justify-center">
+    <a
+      href="{% url 'post-create' %}"
+      class="btn btn-primary bg-blue-600 mb-4 p-2 rounded-3xl font-bold text-white"
+      >Create a post</a
     >
-      <button
-        class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
-      >
-        <span
-          id="like-btn-{{post.id}}"
-          onclick="sendReaction({{post.id}}, 'like')"
-          >Like</span
-        >
-
-        <span id="like-count-{{post.id}}" class="text-sm text-gray-500 ml-1"
-          >{{post.like_count}}</span
-        >
-      </button>
-
-      <button
-        class="flex items-center gap-2 text-gray-600 hover:text-red-600 transition"
-      >
-        <span
-          id="dislike-btn-{{post.id}}"
-          onclick="sendReaction({{post.id}}, 'dislike')"
-          >Dislike</span
-        >
-        <span id="dislike-count-{{post.id}}" class="text-sm text-gray-500 ml-1"
-          >{{post.dislike_count}}</span
-        >
-      </button>
-    </div>
   </div>
 
-  {% endfor %}
+  <div class="container flex-row gap-3">
+    {% for post in posts %}
+    <!-- Card Container -->
+    <div
+      id="post-{{ post.id }}"
+      class="max-w-md mb-2 mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
+    >
+      <!-- User Info Row -->
+      <div class="heading flex justify-between">
+        <div class="flex items-center p-4">
+          <img
+            class="w-12 h-12 rounded-full object-cover bg-blue-900 mr-3"
+            src="{{post.user.profile.profilePicture.url}}"
+            alt="User DP"
+          />
+          <div>
+            <h3 class="text-md font-bold text-gray-800">
+              @{{post.user.username}} <br />
+              {{post.created_at|date:"M d, Y"}}
+            </h3>
+          </div>
+        </div>
+        <div class="crud flex p-4 gap-3">
+          {% if post.user == request.user %}
+          <button
+            onclick="editPost(event, {{post.id}})"
+            class="bg-gray-400 pb-0 rounded-3xl flex items-center justify-center w-18 h-10 font-bold"
+          >
+            Edit
+          </button>
+          <button
+            type="submit"
+            onclick="deletePost(event, {{post.id}})"
+            class="bg-gray-400 pb-0 rounded-3xl flex items-center justify-center w-18 h-10 font-bold"
+          >
+            Delete
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      <!-- Post Description  -->
+      <p
+        id="post-text-{{post.id}}"
+        class="px-4 w-full text-sm font-semibold text-gray-500"
+      >
+        {{post.text}}
+      </p>
+      <!-- Post Image -->
+      {% if post.photo %}
+      <div>
+        <img
+          id="post-image-{{post.id}}"
+          class="w-full object-cover p-4"
+          src="{{ post.photo.url }}"
+          alt="Post Image"
+        />
+      </div>
+      {% else %}
+      <div>
+        <img
+          class="w-full object-cover p-4"
+          src="https://via.placeholder.com/600x400?text=No+Image"
+          alt="Default Image"
+        />
+      </div>
+      {% endif %}
+
+      <!-- Reaction Buttons -->
+      <div
+        class="flex justify-around items-center py-3 border-t border-gray-200 bg-gray-50"
+      >
+        <button
+          class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
+        >
+          <span
+            id="like-btn-{{post.id}}"
+            onclick="sendReaction({{post.id}}, 'like')"
+            >Like</span
+          >
+
+          <span id="like-count-{{post.id}}" class="text-sm text-gray-500 ml-1"
+            >{{post.like_count}}</span
+          >
+        </button>
+
+        <button
+          class="flex items-center gap-2 text-gray-600 hover:text-red-600 transition"
+        >
+          <span
+            id="dislike-btn-{{post.id}}"
+            onclick="sendReaction({{post.id}}, 'dislike')"
+            >Dislike</span
+          >
+          <span
+            id="dislike-count-{{post.id}}"
+            class="text-sm text-gray-500 ml-1"
+            >{{post.dislike_count}}</span
+          >
+        </button>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
 </div>
 
 <script>
@@ -163,20 +194,77 @@
     }
   }
 
-  async function editPost(e, postId) {
+  function editPost(e, postId) {
     e.preventDefault();
-    const response = await fetch(`/${postId}/edit/`, {
-      method: "GET",
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
-    });
-    if (response.ok) {
-      window.location.href = `/${postId}/edit/`;
-    } else {
-      alert("Failed to load edit page.");
-    }
+
+    document.getElementById("main-list-content").style.display = "none";
+
+    const editContainer = document.getElementById("edit-post-container");
+    editContainer.style.display = "block";
+
+    editContainer.dataset.postId = postId;
+    fetch(`/edit/${postId}/`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        document.getElementById("edit-text").value = data.text;
+        if (data.photo_url) {
+          const existingPhoto = document.getElementById("existing-photo");
+          existingPhoto.src = data.photo_url;
+          existingPhoto.style.display = "block";
+        } else {
+          document.getElementById("existing-photo").style.display = "none";
+        }
+      });
+
+    const editForm = document.getElementById("edit-form");
   }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const editForm = document.getElementById("edit-form");
+    const editContainer = document.getElementById("edit-post-container");
+    const mainContent = document.getElementById("main-list-content");
+
+    editForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const postId = editContainer.dataset.postId;
+
+      const formData = new FormData();
+      formData.append("text", document.getElementById("edit-text").value);
+
+      const photoInput = document.getElementById("edit-photo");
+      if (photoInput.files.length > 0) {
+        formData.append("photo", photoInput.files[0]);
+      }
+
+      const csrftoken = getCookie("csrftoken");
+
+      fetch(`/edit/${postId}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrftoken },
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            document.getElementById(`post-text-${postId}`).innerText =
+              data.text;
+
+            const postImage = document.getElementById(`post-image-${postId}`);
+            if (data.photo_url && postImage) {
+              postImage.src = data.photo_url;
+            }
+
+            editContainer.style.display = "none";
+            mainContent.style.display = "block";
+          } else {
+            console.log(data.errors);
+            alert("Failed to update post");
+          }
+        })
+        .catch((err) => console.error(err));
+    });
+  });
 </script>
 
 {% endblock %}

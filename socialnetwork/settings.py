@@ -139,9 +139,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files settings
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "socialnetwork" / "static",
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 
 LOGIN_URL = '/accounts/login/'

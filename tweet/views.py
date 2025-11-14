@@ -42,16 +42,33 @@ def post_create(request):
 @login_required
 def post_edit(request, post_id):
     post_instance = get_object_or_404(post, pk=post_id, user=request.user)
+
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post_instance)
         if form.is_valid():
             post_instance = form.save(commit=False)
             post_instance.user = request.user
             post_instance.save()
-            return redirect('/')
-    else:
-        form = PostForm(instance=post_instance)
-    return render(request, 'post_edit.html', {'form': form})
+
+            data = {
+                'success': True,
+                'post_id': post_instance.id,
+                'text': post_instance.text,
+                'photo_url': post_instance.photo.url if post_instance.photo else ''
+            }
+            return JsonResponse(data)
+        else:
+          
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    else:# for get request
+       
+        data = {
+            'post_id': post_instance.id,
+            'text': post_instance.text,
+            'photo_url': post_instance.photo.url if post_instance.photo else ''
+        }
+        return JsonResponse(data)
 
 
 @login_required    
@@ -126,4 +143,3 @@ def updateProfile(request):
         form=profileForm(instance=profile_instance)
         username_form=usernameForm(instance=request.user)
     return render(request, 'update_profile.html',{'form':form, 'username_form':username_form})
-
